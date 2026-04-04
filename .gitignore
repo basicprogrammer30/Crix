@@ -1,0 +1,10 @@
+target/
+*.o
+*.a
+*.bin
+*.elf
+*.log
+*.img
+*.iso
+*.cpio*
+crix*

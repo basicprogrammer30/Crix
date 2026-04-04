@@ -1,0 +1,1 @@
+OBJ += io/vga/cga.o
