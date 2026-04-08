@@ -13,7 +13,8 @@ build:
 
 	@echo set timeout=0 > $(TARGET_DIR)/boot/grub/grub.cfg
 	@echo menutry ""Crix"" { >> $(TARGET_DIR)/boot/grub/grub.cfg
-	@echo "	   kernel /boot/crix" >> $(TARGET_DIR)/boot/grub/grub.cfg
+	@echo "	   multiboot /boot/crix" >> $(TARGET_DIR)/boot/grub/grub.cfg
+	@echo "	   boot" >> $(TARGET_DIR)/boot/grub/grub.cfg
 	@echo } >> $(TARGET_DIR)/boot/grub/grub.cfg
 	@grub-mkrescue $(TARGET_DIR) -o crix.iso
 

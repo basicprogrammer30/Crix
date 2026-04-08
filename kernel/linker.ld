@@ -1,22 +1,32 @@
-ENTRY(_start) /* the name of the entry label */
+OUTPUT_FORMAT(elf32-i386)
+ENTRY(_start)
 
 SECTIONS {
-    . = 0x00100000; /* the code should be loaded at 1 MB */
-    .text ALIGN (0x1000) : /* align at 4 KB */
+    . = 0x100000;
+
+    .multiboot ALIGN(4) : AT(0x100000)
     {
-        *(.text) /* all text sections from all files */
+        KEEP(*(.multiboot))
     }
-    .rodata ALIGN (0x1000) : /* align at 4 KB */
+
+    .text ALIGN(4) : 
     {
-        *(.rodata*) /* all read-only data sections from all files */
+        *(.text)
     }
-    .data ALIGN (0x1000) : /* align at 4 KB */
+
+    .rodata ALIGN(4) :
     {
-        *(.data) /* all data sections from all files */
+        *(.rodata)
     }
-    .bss ALIGN (0x1000) : /* align at 4 KB */
+
+    .data ALIGN(4) :
     {
-        *(COMMON) /* all COMMON sections from all files */
-        *(.bss) /* all bss sections from all files */
+        *(.data)
+    }
+
+    .bss ALIGN(4) :
+    {
+        *(COMMON)
+        *(.bss)
     }
 }

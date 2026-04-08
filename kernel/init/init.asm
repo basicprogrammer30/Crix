@@ -9,11 +9,11 @@
 
 bits 32
 
-MB_MAGIC        equ 0x1BAD002
-MB_FLAGS        equ 0x0010003
-MB_CHECKSUM     equ -(MB_MAGIC + MB_FLAGS)
+MB_MAGIC        equ 0x1BADB002
+MB_FLAGS        equ 0x00
+MB_CHECKSUM     equ - (MB_MAGIC + MB_FLAGS)
 
-section .multiboot
+section .text
 align 4
     dd MB_MAGIC
     dd MB_FLAGS
@@ -24,7 +24,6 @@ extern kinit
 _start:
     cli
     call kinit
-.loop:
-    jmp .loop
+    hlt
 
 section .note.GNU-stack noalloc noexec nowrite progbits
