@@ -12,4 +12,5 @@
 
 void kinit() {
     print("Hello Crix!", CGA_COLOR_BLACK, CGA_COLOR_WHITE);
+    while(1);
 }
