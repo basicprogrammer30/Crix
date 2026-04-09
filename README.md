@@ -3,7 +3,7 @@ Expremantal Unix Like Operating System
 
 ## Contribute
 ### Requirements
-This Project Requires Tools: `make`, `gcc`, `nasm`, `grub-mkrescue`, `xorriso`
+This Project Requires Tools: `make`, `gcc`, `nasm`, `grub-mkrescue`, `grub-pc-bin`, `grub-common`, `xorriso`, `mtools`
 ```bash
 make build
 ```
