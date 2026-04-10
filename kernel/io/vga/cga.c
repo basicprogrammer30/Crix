@@ -13,7 +13,7 @@
 void print(const char *str, uint8_t bg, uint8_t fg) {
     volatile uint16_t *vram = (volatile uint16_t *)CGA_BUFFER;
 
-    for(int i = 0; str[i] == 0; i++) {
-        vram[i] = ((fg & 0x0F) << 4) | ((bg & 0x0F) << 4) | str[i];
+    for(int i = 0; str[i] != 0; i++) {
+        vram[i] = str[i] | ((fg & 0x0F) << 8) | ((bg & 0x0F) << 12);
     }
 }
