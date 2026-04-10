@@ -35,5 +35,9 @@ enum {
 };
 
 extern void print(const char *str, uint8_t bg, uint8_t fg);
+extern void fillBG(uint8_t bg);
+extern void enableCorsor(uint8_t cursorStart, uint8_t cursorEnd);
+extern void disableCursor();
+extern void moveCursor(uint8_t x, uint8_t y);
 
 #endif // CGA_H
