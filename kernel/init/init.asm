@@ -26,4 +26,15 @@ _start:
     call kinit
     hlt
 
+inb:
+    mov dx, di
+    in ax, dl
+    ret
+
+outb:
+    mov al, sil
+    mov dx, di
+    out dx, al
+    ret
+
 section .note.GNU-stack noalloc noexec nowrite progbits

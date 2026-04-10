@@ -10,7 +10,22 @@
 #include <stdint.h>
 #include <cga.h>
 
+void PANIC(char *expection) {
+    print(expection, CGA_COLOR_BLACK, CGA_COLOR_RED);
+    asm ("cli");
+    while(1);
+}
+
+void WARN(char *message) {
+    print(message, CGA_COLOR_BLACK, CGA_COLOR_YELLOW);
+    while(1);
+}
+
+void INFO(char *message) {
+    print(message, CGA_COLOR_BLACK, CGA_COLOR_GREEN);
+    while(1);
+}
+
 void kinit() {
-    print("Hello Crix!", CGA_COLOR_BLACK, CGA_COLOR_WHITE);
     while(1);
 }
