@@ -18,5 +18,6 @@ extern void outb(uint16_t port, uint8_t value);
 extern void PANIC(char *expection);
 extern void WARN(char *message);
 extern void INFO(char *message);
+extern uint32_t kend;
 
 #endif // KERNEL_H

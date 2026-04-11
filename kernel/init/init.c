@@ -9,6 +9,9 @@
 
 #include <stdint.h>
 #include <cga.h>
+#include <mm.h>
+
+MEMORY_REGION mregions[];
 
 void PANIC(char *expection) {
     print(expection, CGA_COLOR_BLACK, CGA_COLOR_RED);
@@ -26,6 +29,9 @@ void INFO(char *message) {
     while(1);
 }
 
-void kinit() {
+void kinit(uint32_t magic, uint32_t addr) {
+    multiboot_info_t *mbi = (multiboot_info_t*)addr;
+    mm_init(mbi, &mregions);
+
     while(1);
 }

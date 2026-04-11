@@ -23,6 +23,9 @@ global _start
 extern kinit
 _start:
     cli
+    push ebx
+    push eax
+
     call kinit
     hlt
 
