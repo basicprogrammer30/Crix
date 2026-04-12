@@ -89,9 +89,6 @@ void mm_init(multiboot_info_t *mbi, MEMORY_REGION *regions) {
 }
 
 static inline void set_frame(uint32_t frame) {
-    if(!mmIsInitalized)
-        PANIC(MMNINIT);
-
     frame_bitmap[frame / 32] |= (1 << (frame % 32));
 }
 
