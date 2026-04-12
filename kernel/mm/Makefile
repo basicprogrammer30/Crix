@@ -1,1 +1,1 @@
-OBJ += mm/mm.c
+OBJ += mm/mm.o

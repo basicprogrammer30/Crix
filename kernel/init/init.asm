@@ -20,6 +20,8 @@ align 4
     dd MB_CHECKSUM
 
 global _start
+global inb
+global outb
 extern kinit
 _start:
     cli
@@ -30,14 +32,21 @@ _start:
     hlt
 
 inb:
-    mov dx, di
-    in ax, dl
+    push ebp
+    mov ebp, esp
+    mov dx, [ebp + 8]
+    xor eax, eax
+    in al, dx
+    pop ebp
     ret
 
 outb:
-    mov al, sil
-    mov dx, di
+    push ebp
+    mov ebp, esp
+    mov dx, [ebp + 8]
+    mov al, [ebp + 12]
     out dx, al
+    pop ebp
     ret
 
 section .note.GNU-stack noalloc noexec nowrite progbits
