@@ -10,6 +10,7 @@
 #ifndef MM_H
 #define MM_H
 #include <stdint.h>
+#include <stddef.h>
 
 typedef enum {
     MEMORY_TYPE_AVAILABLE = 1,
