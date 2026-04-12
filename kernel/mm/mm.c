@@ -26,6 +26,11 @@ static uint32_t heapStart = 0, heapEnd = 0;
 page_t *page_directory = 0; // Just after bitmap, adjust if needed
 
 bool mmIsInitalized = false;
+
+static inline void set_frame(uint32_t frame);
+static inline void clear_frame(uint32_t frame);
+static inline bool test_frame(uint32_t frame);
+
 void mm_init(multiboot_info_t *mbi, MEMORY_REGION *regions) {
     if (mmIsInitalized)
         return;

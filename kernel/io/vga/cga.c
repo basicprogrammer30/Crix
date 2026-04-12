@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <cga.h>
+#include <kernel.h>
 
 void print(const char *str, uint8_t bg, uint8_t fg) {
     volatile uint16_t *vram = (volatile uint16_t *)CGA_BUFFER;
