@@ -106,9 +106,6 @@ static inline bool test_frame(uint32_t frame) {
 }
 
 uint32_t pmm_alloc_frame() {
-    if(!mmIsInitalized)
-        PANIC(MMNINIT);
-    
     for (uint32_t i = 0; i < total_frames / 32; i++) {
         if(frame_bitmap[i] != 0xFFFFFFFF) {
             for (uint32_t j = 0; j < 32; j++) {
