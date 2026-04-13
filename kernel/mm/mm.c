@@ -112,9 +112,9 @@ uint32_t pmm_alloc_frame() {
                 }
             }
         }
-        else
-            return 0;
     }
+
+    return 0;
 }
 
 void pmm_free_frame(void* addr) {
@@ -137,57 +137,60 @@ void* kmalloc(uint32_t size, int align, void *paddr) {
     // Allocate physcal frames if requested
     for(uint32_t a = addr; a < heapEnd; a += FRAME_SIZE) {
         uint32_t padr = pmm_alloc_frame();
-        map_page(padr, a);
+        map_page((void*)a, (void*)padr);
     }
 
     // Return physcal address if requested
     if(paddr)
-        *paddr = addr;
+        *(uint32_t*)paddr = addr;
     
-    return addr;
+    return (void*)addr;
 }
 
-void virt_to_phys(void *vaddr) {
+void* virt_to_phys(void *vaddr) {
     if(!mmIsInitalized)
         PANIC(MMNINIT);
 
-    uint32_t pd_idx = *vaddr >> 22;
-    uint32_t *pt_idx = (*vaddr >> 12) & 0x3FF;
+    uint32_t va = (uint32_t)vaddr;
+    uint32_t pd_idx = va >> 22;
+    uint32_t pt_idx = (va >> 12) & 0x3FF;
 
-    page_t table = (page_t*)(page_directory[pd_idx] * FRAME_SIZE);
+    page_t *table = (page_t*)(page_directory[pd_idx] & 0xFFFFF000);
     
     // Check if page is exist and mapped
     if((page_directory[pd_idx] & PAGE_PRESENT) == 0 || (table[pt_idx] & PAGE_PRESENT) == 0)
         return 0; // Not mapped
 
-    return (table[pt_idx] & 0xFFF) | (*vaddr & 0xFFF);
+    return (void*)((table[pt_idx] & 0xFFFFF000) | (va & 0xFFF));
 }
 
-void* kfree(void paddr) {
+void kfree(void* paddr) {
     if(!paddr)
         return;
     
     if((uint32_t)paddr == heapEnd)
-        heapEnd = paddr;
+        heapEnd = (uint32_t)paddr;
 }
 
 void map_page(void* vaddr, void* paddr) {
     if(!mmIsInitalized)
         PANIC(MMNINIT);
 
-    uint32_t pd_idx = vaddr >> 22;
-    uint32_t *pt_idx = (vaddr >> 12) & 0x3FF;
+    uint32_t va = (uint32_t)vaddr;
+    uint32_t pa = (uint32_t)paddr;
+    uint32_t pd_idx = va >> 22;
+    uint32_t pt_idx = (va >> 12) & 0x3FF;
 
-    page_t table = (page_t*)(page_directory[pd_idx] * FRAME_SIZE);
+    page_t *table = (page_t*)(page_directory[pd_idx] & 0xFFFFF000);
     
     // If page table doesn't exist, create it
-    if(!table) {
+    if((page_directory[pd_idx] & PAGE_PRESENT) == 0) {
         table = (page_t*)pmm_alloc_frame();
         memset(table, 0, FRAME_SIZE);
         page_directory[pd_idx] = (uint32_t)table | PAGE_PRESENT | PAGE_WRITE;
     }
 
-    table[pt_idx] = (paddr & 0xFFFFF000) | PAGE_PRESENT | PAGE_WRITE;
+    table[pt_idx] = (pa & 0xFFFFF000) | PAGE_PRESENT | PAGE_WRITE;
 }
 
 void *memset(void *dest, int val, size_t leng) {
