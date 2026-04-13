@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include <scheduler.h>
 #include <stdint.h>
 #include <cga.h>
 #include <mm.h>
@@ -31,7 +32,9 @@ void INFO(char *message) {
 
 void kinit(uint32_t magic, uint32_t addr) {
     multiboot_info_t *mbi = (multiboot_info_t*)addr;
+    fillBG(CGA_COLOR_BLACK);
     mm_init(mbi, mregions);
-
-    while(1);
+    addQueue(print("Doing task 1.\n"));
+    addQueue(print("Doing task 2.\n"));
+    shd_init();
 }

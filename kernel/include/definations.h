@@ -10,5 +10,6 @@
 #define DEFINATIONS_H
 
 #define MMNINIT "Memory Manager Is Not Initialized."
+#define MAX_PROCESSQ  64
 
 #endif
