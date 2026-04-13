@@ -14,6 +14,15 @@
 
 MEMORY_REGION mregions[32];
 
+
+void task1() {
+    print("Doing task 1.\n", CGA_COLOR_BLACK, CGA_COLOR_WHITE);
+}
+
+void task2() {
+    print("Doing task 2.\n", CGA_COLOR_BLACK, CGA_COLOR_WHITE);
+}
+
 void PANIC(char *expection) {
     print(expection, CGA_COLOR_BLACK, CGA_COLOR_RED);
     asm ("cli");
@@ -34,7 +43,7 @@ void kinit(uint32_t magic, uint32_t addr) {
     multiboot_info_t *mbi = (multiboot_info_t*)addr;
     fillBG(CGA_COLOR_BLACK);
     mm_init(mbi, mregions);
-    addQueue(print("Doing task 1.\n"));
-    addQueue(print("Doing task 2.\n"));
+    addQueue(task1);
+    addQueue(task2);
     shd_init();
 }
