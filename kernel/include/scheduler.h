@@ -22,8 +22,8 @@ typedef struct {
 typedef struct process_st {
     registers_t *regs;
     pagedir_t   *cr3;
-    process_st  *next;
-    void (*callback)()
+    struct process_st *next;
+    void (*callback)();
 } process_t;
 
 extern void shd_init();
