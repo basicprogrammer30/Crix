@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <strings.h>
+#include <string.h>
 #include <kernel.h>
 #include <sheduler.h>
 #include <definations.h>
