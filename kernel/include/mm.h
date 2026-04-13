@@ -46,9 +46,10 @@ typedef struct multiboot_mmap_entry {
 extern void mm_init(multiboot_info_t *mbi, MEMORY_REGION *regions);
 extern uint32_t pmm_alloc_frame();
 extern void pmm_free_frame(void* addr);
-extern uint32_t kmalloc(uint32_t size, int align, uint32_t *paddr);
-extern void* kfree(uint32_t *paddr);
-extern void map_page(uint32_t vaddr, uint32_t paddr);
+extern void* kmalloc(uint32_t size, int align, void *paddr);
+extern void virt_to_phys(void *vaddr);
+extern void* kfree(void* paddr);
+extern void map_page(void* vaddr, void* paddr);
 extern void *memset(void *dest, int val, size_t leng);
 extern void reload_page_directory(uint32_t pd);
 

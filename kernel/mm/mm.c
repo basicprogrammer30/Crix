@@ -122,7 +122,7 @@ void pmm_free_frame(void* addr) {
     clear_frame(frame);
 }
 
-uint32_t kmalloc(uint32_t size, int align, uint32_t *paddr) {
+void* kmalloc(uint32_t size, int align, void *paddr) {
     if(!mmIsInitalized)
         PANIC(MMNINIT);
     
@@ -147,12 +147,12 @@ uint32_t kmalloc(uint32_t size, int align, uint32_t *paddr) {
     return addr;
 }
 
-uint32_t virt_to_phys(uint32_t vaddr) {
+void virt_to_phys(void *vaddr) {
     if(!mmIsInitalized)
         PANIC(MMNINIT);
 
-    uint32_t pd_idx = vaddr >> 22;
-    uint32_t *pt_idx = (vaddr >> 12) & 0x3FF;
+    uint32_t pd_idx = *vaddr >> 22;
+    uint32_t *pt_idx = (*vaddr >> 12) & 0x3FF;
 
     page_t table = (page_t*)(page_directory[pd_idx] * FRAME_SIZE);
     
@@ -160,18 +160,18 @@ uint32_t virt_to_phys(uint32_t vaddr) {
     if((page_directory[pd_idx] & PAGE_PRESENT) == 0 || (table[pt_idx] & PAGE_PRESENT) == 0)
         return 0; // Not mapped
 
-    return (table[pt_idx] & 0xFFF) | (vaddr & 0xFFF);
+    return (table[pt_idx] & 0xFFF) | (*vaddr & 0xFFF);
 }
 
-void* kfree(uint32_t *paddr) {
+void* kfree(void paddr) {
     if(!paddr)
         return;
     
     if((uint32_t)paddr == heapEnd)
-        heapEnd = (uint32_t)paddr;
+        heapEnd = paddr;
 }
 
-void map_page(uint32_t vaddr, uint32_t paddr) {
+void map_page(void* vaddr, void* paddr) {
     if(!mmIsInitalized)
         PANIC(MMNINIT);
 
