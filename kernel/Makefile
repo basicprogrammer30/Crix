@@ -5,6 +5,7 @@ OBJ =
 include init/Makefile
 include io/vga/Makefile
 include mm/Makefile
+include cpu/Makefile
 
 all: crix
 
