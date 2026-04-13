@@ -1,1 +1,1 @@
-OBJ += cpu/scheduler.c
+OBJ += cpu/scheduler.o
