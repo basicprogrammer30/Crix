@@ -12,12 +12,12 @@
 #include <stddef.h>
 #include <kernel.h>
 #include <mm.h>
+#include <definations.h>
 
 #define PAGE_PRESENT 0x1
 #define PAGE_WRITE   0x2
 
 #define FRAME_SIZE 4096
-#define MMNINIT "Memory Manager Is Not Initialized."
 
 typedef uint32_t page_t;
 static uint32_t *frame_bitmap = (uint32_t*)&kend;
