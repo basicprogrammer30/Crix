@@ -29,6 +29,6 @@ typedef struct process_st {
 extern void shd_init();
 extern int addQueue(void (*callback)());
 extern int removeQueue(void (*callback)());
-extern process_t getCurrentProcess();
+extern process_t* getCurrentProcess();
 
 #endif // SHEDULER_H
