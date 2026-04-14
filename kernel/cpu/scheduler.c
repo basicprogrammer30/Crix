@@ -10,16 +10,19 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <kernel.h>
-#include <sheduler.h>
+#include <scheduler.h>
 #include <definations.h>
 
-process_t cprocess;
-process_t pqueue[MAX_PROCESSQ];
+static process_t *cprocess;
+static process_t *pqueue[MAX_PROCESSQ];
+static int proc_count;
+static volatile void switchTask(registers_t *regs);
+static int getIndexOfProcess(process_t *proc);
 
 void shd_init() {
     bool isAllFN_Exists = true;
-    for(int i = 0; i < sizeof(pqueue); i++) {
-        if(pqueue[i].callback == 0) {
+    for(int i = 0; i < MAX_PROCESSQ; i++) {
+        if(pqueue[i] == 0 || pqueue[i]->callback == 0) {
             isAllFN_Exists = false;
             break;
         }
@@ -36,21 +39,22 @@ void shd_init() {
         
         cprocess = pqueue[curidx];
 
-        if(!((curidx + 1) < MAX_PROCESSQ))
+        if((curidx + 1) < MAX_PROCESSQ)
             cprocess->next = pqueue[curidx + 1];
 
         switchTask(pqueue[curidx]->regs);
+        curidx++;
     }
 }
 
 int addQueue(void (*callback)()) {
-    if (sizeof(pqueue) >= MAX_PROCESSQ)
+    if (proc_count >= MAX_PROCESSQ)
         return 1;
 
     // Check If Callback Function Exists in pqueue or not
     bool isFN_Exists = false;
-    for(int i = 0; i < sizeof(pqueue); i++) {
-        if(pqueue[i].callback == callback) {
+    for(int i = 0; i < MAX_PROCESSQ; i++) {
+        if(pqueue[i] && pqueue[i]->callback == callback) {
             isFN_Exists = true;
             break;
         }
@@ -87,8 +91,8 @@ int addQueue(void (*callback)()) {
 int removeQueue(void (*callback)()) {
     // Prevent From Remove Progress Queue If Progress Queue Count Is 1
     int pqcounts = 0;
-    for(int i = 0; i < sizeof(pqueue); i++) {
-        if(pqueue[i].callback != 0)
+    for(int i = 0; i < MAX_PROCESSQ; i++) {
+        if(pqueue[i] && pqueue[i]->callback != 0)
             pqcounts++;
         else
             break;
@@ -97,8 +101,8 @@ int removeQueue(void (*callback)()) {
     if(pqcounts < 2)
         return 1;
 
-    for(int i = 0; i < sizeof(pqueue); i++) {
-        if(pqueue[i].callback == callback) {
+    for(int i = 0; i < MAX_PROCESSQ; i++) {
+        if(pqueue[i] && pqueue[i]->callback == callback) {
             pqueue[i] = 0;
             break;
         }
@@ -107,12 +111,12 @@ int removeQueue(void (*callback)()) {
     return 0;
 }
 
-volatile void switchTask(registers_t *regs) {
+static volatile void switchTask(registers_t *regs) {
     // Skip Empty Queue
-    if(pqueue.callback == 0) return;
+    if(cprocess == 0) return;
 
     // Save Registers Of Current Progress
-    memcpy(cprocess->regs, regs, sizeof(registers_t))
+    memcpy(cprocess->regs, regs, sizeof(registers_t));
 
     // Do Another Task
     if(cprocess->next) cprocess = cprocess->next;
@@ -125,42 +129,17 @@ volatile void switchTask(registers_t *regs) {
     // Now Set Process Registers
     memcpy(regs, cprocess->regs, sizeof(registers_t));
 
-    asm volatile (
-        "movl %[new_esp], %%esp\n\t" 
-        "movl %[new_eax], %%eax\n\t"
-        "movl %[new_ebx], %%ebx\n\t"
-        "movl %[new_ecx], %%ecx\n\t"
-        "movl %[new_edx], %%edx\n\t"
-        "movl %[new_esi], %%esi\n\t"
-        "movl %[new_edi], %%edi\n\t"
-        "movl %[new_ebp], %%ebp\n\t"
-
-        "call *%[cb]"
-        
-        : // No outputs
-        : [new_esp] "m" (cprocess->regs->esp), // "m" means find it in memory
-        [new_eax] "m" (cprocess->regs->eax),
-        [new_ebx] "m" (cprocess->regs->ebx),
-        [new_ecx] "m" (cprocess->regs->ecx),
-        [new_edx] "m" (cprocess->regs->edx),
-        [new_esi] "m" (cprocess->regs->esi),
-        [new_edi] "m" (cprocess->regs->edi),
-        [new_ebp] "m" (cprocess->regs->ebp),
-        [cb]      "r" (cprocess->callback)    // "r" puts the function address in a register
-        : "memory"
-    );
+    cprocess->callback();
 }
 
-int getIndexOfProcess(process_t *proc) {
-    int result = 0;
-    int i = 0;
-    while(1) {
-        if(pqueue[i]->callback == proc->callback)
-            break;
-        i++;
+static int getIndexOfProcess(process_t *proc) {
+    for(int i = 0; i < MAX_PROCESSQ; i++) {
+        if(pqueue[i] && pqueue[i]->callback == proc->callback)
+            return i;
     }
+    return -1;
 }
 
-process_t getCurrentProcess() {
+process_t* getCurrentProcess() {
     return cprocess;
 }

@@ -52,6 +52,6 @@ extern void kfree(void* paddr);
 extern void map_page(void* vaddr, void* paddr);
 extern void *memset(void *dest, int val, size_t leng);
 extern void reload_page_directory(uint32_t pd);
-extern void* memcpy(void *src, void *dest, int len);
+extern void* memcpy(void *dest, const void *src, int len);
 
 #endif // MM_H
