@@ -9,7 +9,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <string.h>
 #include <kernel.h>
 #include <sheduler.h>
 #include <definations.h>
@@ -20,7 +19,7 @@ process_t pqueue[MAX_PROCESSQ];
 void shd_init() {
     bool isAllFN_Exists = true;
     for(int i = 0; i < sizeof(pqueue); i++) {
-        if(pqueue[i].callback == NULL) {
+        if(pqueue[i].callback == 0) {
             isAllFN_Exists = false;
             break;
         }
@@ -61,13 +60,13 @@ int addQueue(void (*callback)()) {
     if(isFN_Exists)
         return 2;
 
-    // Using 0 for alignment and NULL for physical address as per your kmalloc signature
-    process_t* new_proc = (process_t*)kmalloc(sizeof(process_t), 0, NULL);
-    new_proc->regs = (registers_t*)kmalloc(sizeof(registers_t), 0, NULL);
+    // Using 0 for alignment and 0 for physical address as per your kmalloc signature
+    process_t* new_proc = (process_t*)kmalloc(sizeof(process_t), 0, 0);
+    new_proc->regs = (registers_t*)kmalloc(sizeof(registers_t), 0, 0);
     
     // We use alignment=1 (true) for stack pages usually.
     uint32_t stack_size = 4096;
-    void* stack_mem = kmalloc(stack_size, 1, NULL);    
+    void* stack_mem = kmalloc(stack_size, 1, 0);    
     memset(new_proc->regs, 0, sizeof(registers_t));
     
     uint32_t stack_top = (uint32_t)stack_mem + stack_size;
@@ -75,10 +74,10 @@ int addQueue(void (*callback)()) {
     new_proc->regs->esp = stack_top;
     new_proc->regs->ebp = stack_top; // Standard base pointer init
     new_proc->callback = callback;
-    new_proc->next = NULL;
+    new_proc->next = 0;
 
     pqueue[proc_count++] = new_proc;
-    if (cprocess == NULL) {
+    if (cprocess == 0) {
         cprocess = new_proc;
     }
 
@@ -89,7 +88,7 @@ int removeQueue(void (*callback)()) {
     // Prevent From Remove Progress Queue If Progress Queue Count Is 1
     int pqcounts = 0;
     for(int i = 0; i < sizeof(pqueue); i++) {
-        if(pqueue[i].callback != NULL)
+        if(pqueue[i].callback != 0)
             pqcounts++;
         else
             break;
@@ -100,7 +99,7 @@ int removeQueue(void (*callback)()) {
 
     for(int i = 0; i < sizeof(pqueue); i++) {
         if(pqueue[i].callback == callback) {
-            pqueue[i] = NULL;
+            pqueue[i] = 0;
             break;
         }
     }
@@ -110,7 +109,7 @@ int removeQueue(void (*callback)()) {
 
 volatile void switchTask(registers_t *regs) {
     // Skip Empty Queue
-    if(pqueue.callback == NULL) return;
+    if(pqueue.callback == 0) return;
 
     // Save Registers Of Current Progress
     memcpy(cprocess->regs, regs, sizeof(registers_t))

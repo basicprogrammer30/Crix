@@ -204,3 +204,14 @@ void *memset(void *dest, int val, size_t leng) {
 void reload_page_directory(uint32_t pd) {
     asm volatile ("mov %0, %%cr3" :: "r"(pd));
 }
+
+void* memcpy(void *src, void *dest, int len) {
+    uint32_t s = *src;
+    uint32_t d = *dest;
+
+    while(len--) {
+        s++ = d++;
+    }
+    
+    return dest;
+}
