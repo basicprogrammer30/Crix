@@ -29,14 +29,16 @@ void PANIC(char *expection) {
     while(1);
 }
 
+void ERROR(char *expection) {
+    print(expection, CGA_COLOR_BLACK, CGA_COLOR_RED);
+}
+
 void WARN(char *message) {
     print(message, CGA_COLOR_BLACK, CGA_COLOR_YELLOW);
-    while(1);
 }
 
 void INFO(char *message) {
     print(message, CGA_COLOR_BLACK, CGA_COLOR_GREEN);
-    while(1);
 }
 
 void kinit(uint32_t magic, uint32_t addr) {
