@@ -205,13 +205,13 @@ void reload_page_directory(uint32_t pd) {
     asm volatile ("mov %0, %%cr3" :: "r"(pd));
 }
 
-void* memcpy(void *src, void *dest, int len) {
-    uint32_t s = *src;
-    uint32_t d = *dest;
+void* memcpy(void *dest, const void *src, int len) {
+    uint8_t *d = (uint8_t*)dest;
+    const uint8_t *s = (const uint8_t*)src;
 
     while(len--) {
-        s++ = d++;
+        *d++ = *s++;
     }
-    
+
     return dest;
 }
