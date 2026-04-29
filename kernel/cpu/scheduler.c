@@ -20,15 +20,13 @@ static volatile void switchTask(registers_t *regs);
 static int getIndexOfProcess(process_t *proc);
 
 void shd_init() {
-    bool isAllFN_Exists = true;
+    int qcounts = 0;
     for(int i = 0; i < MAX_PROCESSQ; i++) {
-        if(pqueue[i] == 0 || pqueue[i]->callback == 0) {
-            isAllFN_Exists = false;
-            break;
-        }
+        if(pqueue[i] != 0 || pqueue[i]->callback != 0)
+            qcounts++;
     }
 
-    if(!isAllFN_Exists)
+    if(!qcounts)
         PANIC("No Callback Function To Process.");
     INFO("Scheduler Is Initialized Successfully");
 
