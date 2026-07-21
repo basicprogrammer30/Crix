@@ -8,15 +8,42 @@
  */
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <cga.h>
 #include <kernel.h>
 
-void print(const char *str, uint8_t bg, uint8_t fg) {
+int row = 1, col = 1;
+unsigned bgd = 0x0;
+void print(const char *str, uint8_t bg, uint8_t fg, bool moveWith) {
     volatile uint16_t *vram = (volatile uint16_t *)CGA_BUFFER;
 
     for(int i = 0; str[i] != 0; i++) {
-        vram[i] = str[i] | ((fg & 0x0F) << 8) | ((bg & 0x0F) << 12);
+        if(str[i] == '\n') {
+            for(int c = col; c <= CGA_WIDTH; c++)
+                vram[(row - 1) * CGA_WIDTH + (c - 1)] = ' ' | ((0x0 & 0x0F) << 8) | ((bgd & 0x0F) << 12);
+            row++;
+            col = 1;
+        } else {
+            vram[(row - 1) * CGA_WIDTH + (col - 1)] = str[i] | ((fg & 0x0F) << 8) | ((bg & 0x0F) << 12);
+            col++;
+            if(col > CGA_WIDTH) {
+                col = 1;
+                row++;
+            }
+        }
+
+        if(row > CGA_HEIGHT) {
+            for(int r = 0; r < CGA_HEIGHT - 1; r++)
+                for(int c = 0; c < CGA_WIDTH; c++)
+                    vram[r * CGA_WIDTH + c] = vram[(r + 1) * CGA_WIDTH + c];
+            for(int c = 0; c < CGA_WIDTH; c++)
+                vram[(CGA_HEIGHT - 1) * CGA_WIDTH + c] = ' ' | ((0x0 & 0x0F) << 8) | ((bgd & 0x0F) << 12);
+            row = CGA_HEIGHT;
+        }
     }
+
+    if(moveWith)
+        moveCursor(col - 1, row - 1);
 }
 
 void fillBG(uint8_t bg) {
@@ -25,6 +52,13 @@ void fillBG(uint8_t bg) {
     for(int i = 0; i < CGA_WIDTH * CGA_HEIGHT; i++) {
         vram[i] = ' ' | ((CGA_COLOR_BLACK & 0x0F) << 8) | ((bg & 0x0F) << 12);
     }
+    bgd = bg;
+    row = 1;
+    col = 1;
+}
+
+unsigned int getBGColor() {
+    return bgd;
 }
 
 void enableCorsor(uint8_t cursorStart, uint8_t cursorEnd) {

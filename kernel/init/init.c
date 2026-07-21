@@ -12,40 +12,32 @@
 #include <cga.h>
 #include <mm.h>
 
-MEMORY_REGION mregions[32];
-
-
-void task1() {
-    print("Doing task 1.\n", CGA_COLOR_BLACK, CGA_COLOR_WHITE);
-}
-
-void task2() {
-    print("Doing task 2.\n", CGA_COLOR_BLACK, CGA_COLOR_WHITE);
-}
+extern void kend;
 
 void PANIC(char *expection) {
-    print(expection, CGA_COLOR_BLACK, CGA_COLOR_RED);
+    print(expection + '\n', getBGColor(), CGA_COLOR_RED, true);
     asm ("cli");
-    while(1);
+    while(1) {
+        asm("hlt");
+    }
 }
 
 void ERROR(char *expection) {
-    print(expection, CGA_COLOR_BLACK, CGA_COLOR_RED);
+    print(expection + '\n', getBGColor(), CGA_COLOR_RED, true);
 }
 
 void WARN(char *message) {
-    print(message, CGA_COLOR_BLACK, CGA_COLOR_YELLOW);
+    print(message + '\n', getBGColor(), CGA_COLOR_YELLOW, true);
 }
 
 void INFO(char *message) {
-    print(message, CGA_COLOR_BLACK, CGA_COLOR_GREEN);
+    print(message + '\n', getBGColor(), CGA_COLOR_GREEN, true);
 }
 
 void kinit(uint32_t magic, uint32_t addr) {
     multiboot_info_t *mbi = (multiboot_info_t*)addr;
-    fillBG(CGA_COLOR_BLACK);
-    mm_init(mbi, mregions);
-    addQueue(task1);
-    addQueue(task2);
-    shd_init();
+    fillBG(CGA_COLOR_BLUE);
+    INFO("Starting mm_init");
+    mm_init(mbi, (void*)&kend);
+    INFO("mm_init returned");
 }

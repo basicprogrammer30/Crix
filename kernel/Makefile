@@ -1,4 +1,8 @@
-CFLAGS  = -ffreestanding -nostdlib -m32 -Iinclude
+ifeq ($(DEBUG),1)
+CFLAGS  = -ffreestanding -nostdlib -m32 -Iinclude -g -DDEBUG -O0
+else
+CFLAGS  = -ffreestanding -nostdlib -m32 -Iinclude -O2
+endif
 ASFLAGS = -f elf32
 OBJ =
 

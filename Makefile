@@ -8,14 +8,14 @@ JUNKS = *.o *.a *.bin *.elf *.log *.img *.iso *.cpio* crix*
 build:
 	@$(MAKE) clean
 	@mkdir -p $(TARGET_DIR)/boot/grub
-	@$(MAKE) -C kernel
+	@$(MAKE) -C kernel DEBUG=$(DEBUG)
 	@cp kernel/crix $(TARGET_DIR)/boot
 
-	@echo set timeout=0 > $(TARGET_DIR)/boot/grub/menu.lst
-	@echo menutry ""Crix"" { >> $(TARGET_DIR)/boot/grub/menu.lst
-	@echo "	   multiboot /boot/crix" >> $(TARGET_DIR)/boot/grub/menu.lst
-	@echo "	   boot" >> $(TARGET_DIR)/boot/grub/menu.lst
-	@echo } >> $(TARGET_DIR)/boot/grub/menu.lst
+	@echo "set timeout=0" > $(TARGET_DIR)/boot/grub/grub.cfg
+	@echo "menuentry \"Crix\" {" >> $(TARGET_DIR)/boot/grub/grub.cfg
+	@echo "	multiboot /boot/crix" >> $(TARGET_DIR)/boot/grub/grub.cfg
+	@echo "	boot" >> $(TARGET_DIR)/boot/grub/grub.cfg
+	@echo "}" >> $(TARGET_DIR)/boot/grub/grub.cfg
 	@grub-mkrescue $(TARGET_DIR) -o crix.iso
 
 clean:

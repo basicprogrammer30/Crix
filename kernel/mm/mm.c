@@ -35,9 +35,15 @@ void mm_init(multiboot_info_t *mbi, MEMORY_REGION *regions) {
     if (mmIsInitalized)
         return;
 
+    INFO("mm_init: checking mbi flags");
+    if (!(mbi->flags & 0x40)) {
+        PANIC("No memory map from multiboot");
+    }
+
     uint32_t total_mem = (mbi->mem_upper + 1024) * 1024;
     total_frames = total_mem / FRAME_SIZE;
 
+    INFO("mm_init: calculating bitmap");
     uint32_t bitmap_size = total_frames / 8;
 
     // Align bitmap after kernel
@@ -45,6 +51,7 @@ void mm_init(multiboot_info_t *mbi, MEMORY_REGION *regions) {
     addr = (addr + FRAME_SIZE - 1) & ~(FRAME_SIZE - 1);
     frame_bitmap = (uint32_t*)addr;
 
+    INFO("mm_init: allocating page directory");
     // Allocate page directory
     page_directory = (page_t*)pmm_alloc_frame();
     memset(page_directory, 0, FRAME_SIZE);
@@ -52,11 +59,13 @@ void mm_init(multiboot_info_t *mbi, MEMORY_REGION *regions) {
     heapStart = addr;
     heapEnd = addr;
 
+    INFO("mm_init: marking all frames used");
     // Mark ALL frames as used
     for (uint32_t i = 0; i < bitmap_size / 4; i++) {
         frame_bitmap[i] = 0xFFFFFFFF;
     }
 
+    INFO("mm_init: parsing memory map");
     // parse mmap and FREE usable memory
     uint32_t current = mbi->mmap_addr;
     uint32_t mmap_end = mbi->mmap_addr + mbi->mmap_length;
@@ -68,14 +77,21 @@ void mm_init(multiboot_info_t *mbi, MEMORY_REGION *regions) {
             uint64_t start = entry->addr;
             uint64_t end   = entry->addr + entry->len;
 
-            for (uint64_t a = start; a < end; a += FRAME_SIZE) {
-                clear_frame(a / FRAME_SIZE);
+            // Clamp to valid frame range
+            uint64_t start_frame = start / FRAME_SIZE;
+            uint64_t end_frame = end / FRAME_SIZE;
+            if (start_frame >= total_frames) start_frame = total_frames - 1;
+            if (end_frame > total_frames) end_frame = total_frames;
+
+            for (uint64_t a = start_frame; a < end_frame; a++) {
+                clear_frame(a);
             }
         }
 
         current += entry->size + sizeof(entry->size);
     }
 
+    INFO("mm_init: reserving kernel memory");
     // reserve kernel + bitmap
     uint32_t kernel_start = 0x100000; // adjust if needed
     uint32_t kernel_end   = addr + bitmap_size;

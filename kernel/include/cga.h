@@ -10,6 +10,7 @@
 #ifndef CGA_H
 #define CGA_H
 #include <stdint.h>
+#include <stdbool.h>
 
 #define CGA_WIDTH  80
 #define CGA_HEIGHT 25
@@ -34,10 +35,11 @@ enum {
     CGA_COLOR_WHITE         = 0xF
 };
 
-extern void print(const char *str, uint8_t bg, uint8_t fg);
+extern void print(const char *str, uint8_t bg, uint8_t fg, bool moveWith);
 extern void fillBG(uint8_t bg);
 extern void enableCorsor(uint8_t cursorStart, uint8_t cursorEnd);
 extern void disableCursor();
 extern void moveCursor(uint8_t x, uint8_t y);
+extern unsigned int getBGColor();
 
 #endif // CGA_H

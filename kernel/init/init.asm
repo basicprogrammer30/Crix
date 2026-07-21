@@ -13,12 +13,13 @@ MB_MAGIC        equ 0x1BADB002
 MB_FLAGS        equ 0x00
 MB_CHECKSUM     equ - (MB_MAGIC + MB_FLAGS)
 
-section .text
+section .multiboot
 align 4
     dd MB_MAGIC
     dd MB_FLAGS
     dd MB_CHECKSUM
 
+section .text
 global _start
 global inb
 global outb
